@@ -28,9 +28,15 @@ def insert_data():
                 host='localhost',
                 port='5432'
             )
+    
+    teacher_name = input("Jmeno učitele: ")
+    teacher_age = input("věk učitele: ")
+    teacher_adress = input("adresa učitele: ")
+
     cur = connection.cursor()
-    cur.execute('''INSERT INTO teacher(name, age, address) VALUES ('McGonagallova', 50, 'Bradavice')
-    ''')
+    query = ('''INSERT INTO teacher(name, age, address) 
+                VALUES (%s, %s, %s)''')
+    cur.execute(query, (teacher_name, teacher_age, teacher_adress))
     connection.commit()
     connection.close()
     
