@@ -17,4 +17,19 @@ label_name.grid(row=1, column=0)
 entry_name = Entry(root)
 entry_name.grid(row=1, column=1)
 
+# age section
+label_age = Label(root, text="Age: ")
+label_age.grid(row=2, column=0)
+
+entry_age = Entry(root)
+entry_age.grid(row=2, column=1)
+
+# address section
+label_address = Label(root, text="Address: ")
+label_address.grid(row=3, column = 0)
+
+entry_address = Entry(root)
+entry_address.grid(row=3, column=1)
+
+
 root.mainloop()
