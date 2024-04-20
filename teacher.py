@@ -6,6 +6,24 @@ root.title("Škola a datáze")
 root.geometry("300x280")
 root.resizable(False,False)
 
+# functions
+def insert_data(name, age, address):
+    connection = psycopg2.connect(
+                dbname='student',
+                user='postgres',
+                password='admin',
+                host='localhost',
+                port='5432'
+            )
+    
+    cur = connection.cursor()
+    query = ('''INSERT INTO teacher(name, age, address) 
+                VALUES (%s, %s, %s)''')
+    cur.execute(query, (name, age, address))
+    connection.commit()
+    connection.close()
+
+
 # labels a entries
 label_general = Label(root, text="Add data")
 label_general.grid(row=0, column=1)
@@ -32,7 +50,7 @@ entry_address = Entry(root)
 entry_address.grid(row=3, column=1)
 
 # button
-button = Button(root, text="Add")
+button = Button(root, text="Add", command=lambda:insert_data(entry_name.get(), entry_age.get(), entry_address.get()))
 button.grid(row=4, column=1)
 
 
