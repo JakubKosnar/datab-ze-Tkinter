@@ -36,8 +36,8 @@ def search_id(id):
     
     cur = connection.cursor()
     query = ('''SELECT * FROM teacher 
-                WHERE id = %s''')
-    cur.execute(query, (id))
+                WHERE id = (%s) ''')
+    cur.execute(query, (id,))
     searched_teacher = cur.fetchone()
     display_search(searched_teacher)
     connection.commit()
@@ -45,12 +45,29 @@ def search_id(id):
 
     
 def display_search(data):
-    listbox = Listbox(root, width=20, height=3)
+    listbox = Listbox(root, width=20, height=4)
     listbox.grid(row=8, column=1)
-    listbox.insert(0,("jméno:",data[1]))
-    listbox.insert(1,("věk:",data[2]))
-    listbox.insert(2,("adresa:",data[3]))
+    listbox.insert(0,("id:",data[0]), ("name:",data[1]), ("age:",data[2]), ("address:",data[3]))
+    
 
+def display_all():
+    connection = psycopg2.connect(
+                dbname='student',
+                user='postgres',
+                password='admin',
+                host='localhost',
+                port='5432'
+            )
+    
+    cur = connection.cursor()
+    query = ('''SELECT * FROM teacher''')
+    cur.execute(query)
+    all_teacher =cur.fetchall()
+    listbox = Listbox(root, width=20, height=4)
+    listbox.grid(row=8, column=1)
+
+    for teacher in all_teacher:
+        listbox.insert(END,teacher)
 
     
 # labels a entries
@@ -96,6 +113,9 @@ entry_id.grid(row=6, column=1)
 button_search = Button(root, text="search", command=lambda:search_id(entry_id.get()))
 button_search.grid(row=6, column=2)
 
+# display all
+button_all = Button(root, text="display all", command=display_all)
+button_all.grid(row=7, column=2)
 
 
 root.mainloop()
