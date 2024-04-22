@@ -8,6 +8,10 @@ root.resizable(False,False)
 
 # functions
 def insert_data(name, age, address):
+    entry_name.delete(0, END)
+    entry_age.delete(0, END)
+    entry_address.delete(0, END)
+
     connection = psycopg2.connect(
                 dbname='student',
                 user='postgres',
@@ -49,7 +53,6 @@ def display_search(data):
     listbox = Listbox(root, width=20, height=4)
     listbox.grid(row=8, column=1)
     listbox.insert(0,("id:",data[0]), ("name:",data[1]), ("age:",data[2]), ("address:",data[3]))
-    
 
 def display_all():
     connection = psycopg2.connect(
@@ -69,6 +72,13 @@ def display_all():
 
     for teacher in all_teacher:
         listbox.insert(END,teacher)
+
+def error_id():
+    error = Tk()
+    error.title("Chyba")
+    
+    label_error = Label(error, text="enter ID")
+    label_error.grid(row=0, column=0)
 
     
 # labels a entries
@@ -111,7 +121,7 @@ label_id.grid(row=6, column=0)
 entry_id=Entry()
 entry_id.grid(row=6, column=1)
 
-button_search = Button(root, text="search", command=lambda:search_id(entry_id.get()))
+button_search = Button(root, text="search", command=lambda:search_id(entry_id.get()) if entry_id.get().strip() else error_id())
 button_search.grid(row=6, column=2)
 
 
