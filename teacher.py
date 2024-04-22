@@ -22,6 +22,7 @@ def insert_data(name, age, address):
     cur.execute(query, (name, age, address))
     connection.commit()
     connection.close()
+    display_all()
 
 
 def search_id(id):
@@ -62,7 +63,7 @@ def display_all():
     cur = connection.cursor()
     query = ('''SELECT * FROM teacher''')
     cur.execute(query)
-    all_teacher =cur.fetchall()
+    all_teacher = cur.fetchall()
     listbox = Listbox(root, width=20, height=4)
     listbox.grid(row=8, column=1)
 
@@ -113,9 +114,7 @@ entry_id.grid(row=6, column=1)
 button_search = Button(root, text="search", command=lambda:search_id(entry_id.get()))
 button_search.grid(row=6, column=2)
 
-# display all
-button_all = Button(root, text="display all", command=display_all)
-button_all.grid(row=7, column=2)
 
+display_all()
 
 root.mainloop()
