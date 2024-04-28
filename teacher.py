@@ -1,10 +1,18 @@
 from tkinter import *
 import psycopg2
+from psycopg2 import pool
 
 root = Tk()
 root.title("Škola a datáze")
 root.geometry("330x320")
 root.resizable(False,False)
+
+db_pool = pool.SimpleConnectionPool(1, 10, 
+                                    dbname='student',
+                                    user='postgres',
+                                    password='admin',
+                                    host='localhost',
+                                    port='5432')
 
 # functions
 def insert_data(name, age, address):
@@ -13,44 +21,28 @@ def insert_data(name, age, address):
         entry_age.delete(0, END)
         entry_address.delete(0, END)
 
-        connection = psycopg2.connect(
-                    dbname='student',
-                    user='postgres',
-                    password='admin',
-                    host='localhost',
-                    port='5432'
-                )
-        
-        cur = connection.cursor()
-        query = ('''INSERT INTO teacher(name, age, address) 
-                    VALUES (%s, %s, %s)''')
-        cur.execute(query, (name, age, address))
-        connection.commit()
-        connection.close()
+        with db_pool.getconn() as conn:
+            with conn.cursor() as cur:
+                query = ('''INSERT INTO teacher(name, age, address) 
+                            VALUES (%s, %s, %s)''')
+                cur.execute(query, (name, age, address))
+                conn.commit()
+            db_pool.putconn(conn)
         show_db()
     else:
         listbox.delete(0,END)
         listbox.insert(0, "zadejte všechny položky")
 
-
+ 
 def search_id(id):
-    connection = psycopg2.connect(
-                dbname='student',
-                user='postgres',
-                password='admin',
-                host='localhost',
-                port='5432'
-            )
-    
-    cur = connection.cursor()
-    query = ('''SELECT * FROM teacher 
-                WHERE id = (%s) ''')
-    cur.execute(query, (id,))
-    searched_teacher = cur.fetchone()
-    display_search(searched_teacher)
-    
-    connection.commit()
-    connection.close()
+    with db_pool.getconn() as conn:
+            with conn.cursor() as cur:
+                query = ('''SELECT * FROM teacher WHERE id = (%s) ''')
+                cur.execute(query, (id,))
+                searched_teacher = cur.fetchone()
+                display_search(searched_teacher)
+                conn.commit()
+            db_pool.putconn(conn)
 
     
 def display_search(data):
@@ -61,20 +53,13 @@ def display_search(data):
         listbox.insert(0,"ID nenalezeno")
 
 def down_db():
-    connection = psycopg2.connect(
-                dbname='student',
-                user='postgres',
-                password='admin',
-                host='localhost',
-                port='5432'
-            )
-    
-    cur = connection.cursor()
-    query = ('''SELECT * FROM teacher''')
-    cur.execute(query)
-    all_teacher = cur.fetchall()
-    connection.commit()
-    connection.close()
+    with db_pool.getconn() as conn:
+            with conn.cursor() as cur:
+                query = ('''SELECT * FROM teacher''')
+                cur.execute(query)
+                all_teacher = cur.fetchall()
+                conn.commit()
+            db_pool.putconn(conn)
     return all_teacher
 
 
@@ -91,19 +76,13 @@ def show_db():
 def delete_from_db(listbox):
     selected_indices = listbox.curselection()
     to_delete = str(listbox.get(selected_indices)[0])
-    connection = psycopg2.connect(
-        dbname="student",
-        user="postgres",
-        password="admin",
-        host="localhost",
-        port="5432"
-    )
-
-    cur = connection.cursor()
-    query = ('''DELETE FROM teacher WHERE id = %s''')
-    cur.execute(query, (to_delete,))
-    connection.commit()
-    connection.close()
+    
+    with db_pool.getconn() as conn:
+        with conn.cursor() as cur:
+            query = ('''DELETE FROM teacher WHERE id = %s''')
+            cur.execute(query, (to_delete,))
+            conn.commit()
+        db_pool.putconn(conn)
     show_db()
 
     
